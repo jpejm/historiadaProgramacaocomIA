@@ -489,39 +489,45 @@ function addTyping() {
 }
 
 // QUIZ
-const QUIZ_SYS = `Você é um gerador de perguntas de quiz sobre história da programação para trabalho escolar.
-Gere 1 pergunta de múltipla escolha com 4 opções (A, B, C, D).
-Retorne APENAS JSON válido, sem markdown, sem texto extra, sem crases:
-{"question":"...","options":["A) ...","B) ...","C) ...","D) ..."],"correct":0,"explanation":"..."}
-- correct é o índice (0=A, 1=B, 2=C, 3=D)
-- explanation é uma explicação curta e educativa (1-2 frases)
-- Varie: pioneiros, datas, linguagens, conceitos, curiosidades históricas
-- Dificuldade variada entre fácil e difícil`;
+const QUIZ_BANK = [
+  { question: "Quem é considerada a primeira programadora da história?", options: ["A) Grace Hopper", "B) Ada Lovelace", "C) Margaret Hamilton", "D) Hedy Lamarr"], correct: 1, explanation: "Ada Lovelace escreveu o primeiro algoritmo destinado a ser processado por uma máquina, a Máquina Analítica de Babbage, em 1843." },
+  { question: "Qual linguagem de programação foi criada por Dennis Ritchie em 1972?", options: ["A) Pascal", "B) FORTRAN", "C) C", "D) COBOL"], correct: 2, explanation: "Dennis Ritchie criou a linguagem C nos laboratórios Bell. Ela tornou-se base para quase todas as linguagens modernas." },
+  { question: "O que Alan Turing propôs em seu artigo de 1936 'On Computable Numbers'?", options: ["A) A internet", "B) O modelo teórico de uma máquina universal computável", "C) O primeiro compilador", "D) A linguagem Assembly"], correct: 1, explanation: "Turing propôs a Máquina de Turing, um modelo teórico que fundamenta toda a computação moderna." },
+  { question: "Grace Hopper é creditada por popularizar qual termo da programação?", options: ["A) Algoritmo", "B) Variável", "C) Bug", "D) Loop"], correct: 2, explanation: "Em 1945, Grace Hopper encontrou uma mariposa presa num relé do Mark II, popularizando o termo 'bug' para falhas em sistemas." },
+  { question: "Em que ano Guido van Rossum lançou a linguagem Python?", options: ["A) 1985", "B) 1991", "C) 1995", "D) 2001"], correct: 1, explanation: "Python foi lançado em 1991 com a filosofia de que código deve ser legível e simples de escrever." },
+  { question: "Qual foi a primeira linguagem de programação de alto nível criada?", options: ["A) COBOL", "B) LISP", "C) FORTRAN", "D) Pascal"], correct: 2, explanation: "FORTRAN (FORmula TRANslation) foi criado pela IBM em 1957 e é considerado a primeira linguagem de alto nível da história." },
+  { question: "Brendan Eich criou o JavaScript em quantos dias, em 1995?", options: ["A) 3 dias", "B) 10 dias", "C) 30 dias", "D) 60 dias"], correct: 1, explanation: "Brendan Eich desenvolveu o JavaScript em apenas 10 dias para a Netscape. Hoje é a linguagem mais usada do mundo." },
+  { question: "O tear de Jacquard (1804) influenciou a computação por usar qual tecnologia precursora?", options: ["A) Válvulas eletrônicas", "B) Transistores", "C) Cartões perfurados", "D) Circuitos integrados"], correct: 2, explanation: "O tear de Jacquard usava cartões perfurados para programar padrões, inspirando pioneiros como Charles Babbage." },
+  { question: "Qual sistema operacional foi criado junto com a linguagem C?", options: ["A) DOS", "B) Windows", "C) Linux", "D) Unix"], correct: 3, explanation: "Dennis Ritchie e Ken Thompson criaram o Unix nos Bell Labs simultaneamente ao desenvolvimento da linguagem C, em 1972." },
+  { question: "O que Grace Hopper criou em 1952 que foi considerado impossível por seus colegas?", options: ["A) O primeiro mouse", "B) O primeiro compilador", "C) A primeira linguagem orientada a objetos", "D) O primeiro banco de dados"], correct: 1, explanation: "O compilador A-0 de Grace Hopper traduzia código matemático em linguagem de máquina, algo que seus contemporâneos julgavam inviável." },
+  { question: "Em qual guerra Alan Turing contribuiu decifando códigos secretos?", options: ["A) 1ª Guerra Mundial", "B) Guerra do Vietnã", "C) 2ª Guerra Mundial", "D) Guerra Fria"], correct: 2, explanation: "Turing liderou a equipe que decifrou o código Enigma dos nazistas em Bletchley Park, contribuindo decisivamente para o fim da 2ª Guerra." },
+  { question: "O COBOL, criado com influência de Grace Hopper, ainda é usado principalmente em qual setor?", options: ["A) Jogos digitais", "B) Redes sociais", "C) Bancos e governos", "D) Inteligência artificial"], correct: 2, explanation: "COBOL (1959) foi projetado para negócios e ainda processa trilhões de transações bancárias e governamentais diariamente." },
+  { question: "Qual linguagem foi criada por John McCarthy no MIT em 1958 com foco em inteligência artificial?", options: ["A) ALGOL", "B) LISP", "C) PL/I", "D) Smalltalk"], correct: 1, explanation: "LISP foi uma das primeiras linguagens de programação e a primeira projetada especificamente para inteligência artificial." },
+  { question: "Qual é o nome do teste proposto por Alan Turing para avaliar inteligência artificial?", options: ["A) Teste de Lovelace", "B) Teste de Hopper", "C) Teste de Turing", "D) Teste de Shannon"], correct: 2, explanation: "O Teste de Turing, proposto em 1950, avalia se uma máquina pode exibir comportamento inteligente indistinguível do humano." },
+  { question: "Ada Lovelace foi filha de qual famoso poeta inglês?", options: ["A) Shakespeare", "B) Lord Byron", "C) John Keats", "D) William Blake"], correct: 1, explanation: "Ada era filha de Lord Byron, o célebre poeta romântico. Sua mãe, temendo que ela herdasse a 'loucura' do pai, incentivou seu estudo de matemática." },
+  { question: "O que significa a sigla FORTRAN?", options: ["A) Formula Translation", "B) Forward Training", "C) Fast Runtime Analysis", "D) Functional Translation"], correct: 0, explanation: "FORTRAN significa FORmula TRANslation, pois foi projetado para traduzir fórmulas matemáticas em código de máquina." },
+  { question: "Qual linguagem tornou-se a base de C#, Java, JavaScript, PHP e Python?", options: ["A) COBOL", "B) FORTRAN", "C) ALGOL", "D) C"], correct: 3, explanation: "A linguagem C é considerada a 'mãe' de quase todas as linguagens modernas, influenciando direta ou indiretamente a maioria das linguagens atuais." },
+  { question: "Em que décadas foi inventado o transistor, substituindo as válvulas e miniaturizando os computadores?", options: ["A) 1930s", "B) 1940–50s", "C) 1960–70s", "D) 1980s"], correct: 1, explanation: "O transistor foi inventado em 1947 nos Bell Labs e se tornou dominante nos computadores nos anos 1950-60, substituindo as enormes válvulas eletrônicas." },
+  { question: "Qual paradigma de programação o Java popularizou nos anos 1990?", options: ["A) Programação funcional", "B) Programação procedural", "C) Programação orientada a objetos", "D) Programação lógica"], correct: 2, explanation: "Java popularizou a programação orientada a objetos (POO) com o slogan 'Write once, run anywhere', tornando-se dominante no desenvolvimento empresarial." },
+  { question: "Qual linguagem é mais usada em ciência de dados e inteligência artificial atualmente?", options: ["A) Java", "B) C++", "C) Ruby", "D) Python"], correct: 3, explanation: "Python domina a ciência de dados e IA graças à sua sintaxe simples e ao ecossistema de bibliotecas como NumPy, Pandas e TensorFlow." },
+];
 
 let quizQ = null, quizScore = 0, quizTotal = 0, quizAnswered = false;
+let quizUsed = [];
 
-async function startQuiz() { quizScore = 0; quizTotal = 0; await loadQ(); }
+async function startQuiz() { quizScore = 0; quizTotal = 0; quizUsed = []; await loadQ(); }
 
 async function loadQ() {
   quizAnswered = false;
-  document.getElementById('quizContent').innerHTML = `<div style="text-align:center;padding:2rem 0;"><div class="typing" style="justify-content:center"><span></span><span></span><span></span></div><p style="color:var(--muted);font-size:0.8rem;margin-top:.75rem;font-family:'IBM Plex Mono',monospace;">Gerando pergunta com IA…</p></div>`;
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514', max_tokens: 500,
-        system: QUIZ_SYS,
-        messages: [{ role: 'user', content: 'Gere uma pergunta de quiz sobre história da programação. Pergunta número ' + (quizTotal + 1) + '. Varie o tema e dificuldade.' }]
-      })
-    });
-    const data = await res.json();
-    const raw = data.content?.map(c => c.text||'').join('').replace(/```json|```/g,'').trim();
-    quizQ = JSON.parse(raw);
-    renderQ();
-  } catch(e) {
-    document.getElementById('quizContent').innerHTML = '<p style="color:var(--muted);text-align:center;padding:2rem">Erro ao gerar pergunta. <button class="quiz-start-btn" onclick="loadQ()" style="margin-left:1rem;font-size:0.65rem;padding:.4rem 1rem">Tentar de novo</button></p>';
-  }
+  document.getElementById('quizContent').innerHTML = `<div style="text-align:center;padding:2rem 0;"><div class="typing" style="justify-content:center"><span></span><span></span><span></span></div><p style="color:var(--muted);font-size:0.8rem;margin-top:.75rem;font-family:'IBM Plex Mono',monospace;">Carregando pergunta…</p></div>`;
+  // Reset quando acabar as perguntas
+  if (quizUsed.length >= QUIZ_BANK.length) quizUsed = [];
+  // Pega pergunta aleatória não usada
+  let available = QUIZ_BANK.map((_, i) => i).filter(i => !quizUsed.includes(i));
+  let idx = available[Math.floor(Math.random() * available.length)];
+  quizUsed.push(idx);
+  quizQ = QUIZ_BANK[idx];
+  setTimeout(renderQ, 600);
 }
 
 function renderQ() {
