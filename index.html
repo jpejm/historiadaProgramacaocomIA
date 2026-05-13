@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>História da Programação</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0a0a0f; --bg2: #111118; --bg3: #1a1a24;
+  --line: rgba(255,255,255,0.07); --line2: rgba(255,255,255,0.15);
+  --accent: #7c6af7; --accent2: #4fd8b4; --accent3: #f06a4d;
+  --text: #e8e6f0; --muted: #8884a0;
+}
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--text); font-family: 'IBM Plex Sans', sans-serif; font-weight: 300; line-height: 1.7; overflow-x: hidden; }
+
+nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 1.1rem 5vw; display: flex; justify-content: space-between; align-items: center; backdrop-filter: blur(14px); background: rgba(10,10,15,0.8); border-bottom: 1px solid var(--line); }
+.nav-logo { font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text); text-decoration: none; }
+.nav-links { display: flex; gap: 1.8rem; list-style: none; }
+.nav-links a { font-family: 'IBM Plex Mono', monospace; font-size: 0.62rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); text-decoration: none; transition: color 0.15s; }
+.nav-links a:hover { color: var(--accent2); }
+
+.hero { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; padding: 7rem 6vw 4rem; position: relative; border-bottom: 1px solid var(--line); }
+.hero::after { content: ''; position: absolute; top: 0; right: 0; width: 60vw; height: 60vh; background: radial-gradient(ellipse at top right, rgba(124,106,247,0.12) 0%, transparent 65%); pointer-events: none; }
+.hero-eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; letter-spacing: 0.22em; color: var(--accent2); text-transform: uppercase; margin-bottom: 1.5rem; }
+.hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(3rem, 8vw, 7rem); font-weight: 900; line-height: 1.0; letter-spacing: -0.02em; max-width: 900px; margin-bottom: 2rem; }
+.hero h1 span { color: var(--accent); }
+.hero-sub { font-size: 1.05rem; color: var(--muted); max-width: 520px; margin-bottom: 1.5rem; }
+.hero-tags { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-bottom: 2.5rem; }
+.hero-tag { padding: 3px 12px; border: 1px solid var(--line2); font-family: 'IBM Plex Mono', monospace; font-size: 0.62rem; letter-spacing: 0.1em; color: var(--muted); border-radius: 2px; }
+.scroll-hint { display: flex; align-items: center; gap: 0.75rem; font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; letter-spacing: 0.15em; color: var(--muted); text-transform: uppercase; }
+.scroll-hint::before { content: ''; display: block; width: 40px; height: 1px; background: var(--muted); }
+
+.section { padding: 5.5rem 6vw; position: relative; }
+.section-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; letter-spacing: 0.25em; color: var(--accent); text-transform: uppercase; margin-bottom: 0.75rem; }
+.section-title { font-family: 'Playfair Display', serif; font-size: clamp(1.8rem, 3.5vw, 3rem); font-weight: 700; margin-bottom: 3rem; max-width: 600px; }
+
+.stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 2rem; margin-bottom: 4rem; }
+.stat-num { font-family: 'Playfair Display', serif; font-size: 2.4rem; font-weight: 900; color: var(--accent); line-height: 1; }
+.stat-label { font-size: 0.72rem; color: var(--muted); margin-top: 0.2rem; font-family: 'IBM Plex Mono', monospace; letter-spacing: 0.08em; }
+
+.timeline { position: relative; padding-left: 3rem; }
+.timeline::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 1px; background: linear-gradient(to bottom, transparent, var(--accent) 8%, var(--accent) 92%, transparent); }
+.era { position: relative; margin-bottom: 3.5rem; opacity: 0; transform: translateX(-20px); transition: all 0.5s ease; }
+.era.visible { opacity: 1; transform: translateX(0); }
+.era::before { content: ''; position: absolute; left: -3.4rem; top: 0.35rem; width: 9px; height: 9px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 14px var(--accent); }
+.era-year { font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; letter-spacing: 0.2em; color: var(--accent2); margin-bottom: 0.4rem; }
+.era h3 { font-family: 'Playfair Display', serif; font-size: 1.35rem; font-weight: 700; margin-bottom: 0.6rem; }
+.era p { color: var(--muted); font-size: 0.92rem; max-width: 640px; margin-bottom: 0.75rem; }
+.era-tags { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-top: 0.4rem; }
+.era-tag-pill { padding: 2px 9px; border: 1px solid var(--line2); border-radius: 2px; font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem; letter-spacing: 0.08em; color: var(--muted); text-transform: uppercase; }
+.era-source { display: inline-flex; align-items: center; gap: 5px; margin-top: 0.6rem; font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem; color: var(--accent); text-decoration: none; border-bottom: 1px solid transparent; transition: border-color 0.15s; }
+.era-source:hover { border-color: var(--accent); }
+.era-source::before { content: '↗'; }
+
+.pioneers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 1.5rem; }
+.pioneer-card { background: var(--bg3); border: 1px solid var(--line2); padding: 2rem; border-radius: 3px; transition: border-color 0.2s, background 0.2s; }
+.pioneer-card:hover { border-color: var(--accent); background: rgba(124,106,247,0.04); }
+.pioneer-emoji { font-size: 2rem; margin-bottom: 1rem; }
+.pioneer-name { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; margin-bottom: 0.25rem; }
+.pioneer-years { font-family: 'IBM Plex Mono', monospace; font-size: 0.62rem; color: var(--accent2); letter-spacing: 0.12em; margin-bottom: 0.9rem; }
+.pioneer-desc { font-size: 0.84rem; color: var(--muted); line-height: 1.65; margin-bottom: 0.9rem; }
+.pioneer-fact { font-size: 0.8rem; color: var(--text); background: rgba(255,255,255,0.03); border-left: 2px solid var(--accent2); padding: 0.5rem 0.75rem; margin-bottom: 0.75rem; font-style: italic; }
+.pioneer-source { font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem; color: var(--accent); text-decoration: none; display: inline-flex; align-items: center; gap: 4px; }
+.pioneer-source::before { content: '↗'; }
+.pioneer-source:hover { text-decoration: underline; }
+
+.chat-wrapper { max-width: 720px; margin: 0 auto; }
+.chat-box { background: var(--bg3); border: 1px solid var(--line2); border-radius: 4px; overflow: hidden; }
+.chat-messages { height: 340px; overflow-y: auto; padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
+.chat-messages::-webkit-scrollbar { width: 4px; }
+.chat-messages::-webkit-scrollbar-thumb { background: var(--line2); border-radius: 2px; }
+.msg { display: flex; gap: 0.75rem; animation: fadeUp 0.3s ease; }
+@keyframes fadeUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+.msg-avatar { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.68rem; font-weight: 500; flex-shrink: 0; margin-top: 2px; }
+.msg.user .msg-avatar { background: var(--accent); color: #fff; }
+.msg.ai .msg-avatar { background: var(--accent2); color: #0a0a0f; }
+.msg-text { font-size: 0.87rem; line-height: 1.65; color: var(--text); flex: 1; }
+.msg.user .msg-text { color: rgba(232,230,240,0.75); }
+.msg-text strong { color: var(--accent2); font-weight: 500; }
+.msg-sources { margin-top: 0.6rem; display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.msg-src-link { font-family: 'IBM Plex Mono', monospace; font-size: 0.58rem; color: var(--accent); border: 1px solid rgba(124,106,247,0.3); padding: 2px 7px; border-radius: 2px; text-decoration: none; }
+.msg-src-link:hover { background: rgba(124,106,247,0.1); }
+.typing { display: flex; gap: 4px; align-items: center; padding: 4px 0; }
+.typing span { width: 5px; height: 5px; background: var(--muted); border-radius: 50%; animation: blink 1.2s infinite; }
+.typing span:nth-child(2) { animation-delay: 0.2s; }
+.typing span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes blink { 0%,80%,100% { opacity:0.2; transform:scale(0.9); } 40% { opacity:1; transform:scale(1); } }
+.chat-input-area { border-top: 1px solid var(--line); padding: 0.9rem 1.2rem; display: flex; gap: 0.75rem; align-items: flex-end; }
+.chat-input { flex: 1; background: transparent; border: none; outline: none; color: var(--text); font-family: 'IBM Plex Sans', sans-serif; font-size: 0.87rem; resize: none; line-height: 1.5; min-height: 38px; max-height: 120px; }
+.chat-input::placeholder { color: var(--muted); }
+.chat-btn { background: var(--accent); color: #fff; border: none; border-radius: 2px; padding: 0.5rem 1.1rem; font-family: 'IBM Plex Mono', monospace; font-size: 0.67rem; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: opacity 0.2s; white-space: nowrap; }
+.chat-btn:hover { opacity: 0.85; }
+.chat-btn:disabled { opacity: 0.4; cursor: default; }
+.quick-questions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; }
+.quick-btn { background: transparent; border: 1px solid var(--line2); color: var(--muted); padding: 4px 11px; font-family: 'IBM Plex Mono', monospace; font-size: 0.62rem; cursor: pointer; border-radius: 2px; transition: all 0.15s; }
+.quick-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+.quiz-wrapper { max-width: 680px; margin: 0 auto; }
+.quiz-box { background: var(--bg3); border: 1px solid var(--line2); border-radius: 4px; padding: 2.5rem; }
+.quiz-progress { font-family: 'IBM Plex Mono', monospace; font-size: 0.62rem; color: var(--muted); letter-spacing: 0.12em; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 1rem; }
+.quiz-bar { flex: 1; height: 2px; background: var(--line2); border-radius: 1px; overflow: hidden; }
+.quiz-bar-fill { height: 100%; background: var(--accent2); border-radius: 1px; transition: width 0.4s ease; }
+.quiz-question { font-family: 'Playfair Display', serif; font-size: 1.25rem; font-weight: 700; margin-bottom: 2rem; line-height: 1.4; }
+.quiz-options { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1.5rem; }
+.quiz-opt { background: transparent; border: 1px solid var(--line2); color: var(--text); padding: 0.85rem 1.1rem; text-align: left; font-family: 'IBM Plex Sans', sans-serif; font-size: 0.87rem; cursor: pointer; border-radius: 3px; transition: all 0.15s; display: flex; align-items: center; gap: 0.75rem; }
+.quiz-opt:hover:not(:disabled) { border-color: var(--accent); background: rgba(124,106,247,0.05); }
+.quiz-opt.correct { border-color: var(--accent2); background: rgba(79,216,180,0.08); color: var(--accent2); }
+.quiz-opt.wrong { border-color: var(--accent3); background: rgba(240,106,77,0.08); color: var(--accent3); }
+.quiz-opt:disabled { cursor: default; }
+.opt-letter { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; width: 22px; height: 22px; border: 1px solid var(--line2); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.quiz-feedback { font-size: 0.85rem; padding: 0.75rem 1rem; border-radius: 3px; margin-bottom: 1rem; line-height: 1.55; }
+.quiz-feedback.ok { background: rgba(79,216,180,0.08); border: 1px solid rgba(79,216,180,0.25); color: var(--accent2); }
+.quiz-feedback.ko { background: rgba(240,106,77,0.08); border: 1px solid rgba(240,106,77,0.25); color: var(--accent3); }
+.quiz-next-btn { background: var(--accent2); color: #0a0a0f; border: none; border-radius: 2px; padding: 0.6rem 1.4rem; font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; font-weight: 500; transition: opacity 0.2s; }
+.quiz-next-btn:hover { opacity: 0.85; }
+.quiz-start-btn { background: var(--accent); color: #fff; border: none; border-radius: 2px; padding: 0.65rem 1.6rem; font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: opacity 0.2s; }
+.quiz-start-btn:hover { opacity: 0.85; }
+
+.sources-footer { padding: 2.5rem 6vw; background: var(--bg2); border-top: 1px solid var(--line); }
+.sources-footer h4 { font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); margin-bottom: 1rem; }
+.source-list-footer { display: flex; flex-direction: column; gap: 0.4rem; }
+.source-list-footer a { font-size: 0.78rem; color: var(--accent); text-decoration: none; font-family: 'IBM Plex Mono', monospace; }
+.source-list-footer a:hover { text-decoration: underline; }
+
+footer { padding: 2.5rem 6vw; border-top: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+footer p { font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; color: var(--muted); letter-spacing: 0.08em; }
+
+@media (max-width: 600px) {
+  .hero, .section { padding-left: 1.4rem; padding-right: 1.4rem; }
+  nav { padding: 1rem 1.4rem; }
+  .nav-links { display: none; }
+  .sources-footer, footer { padding-left: 1.4rem; padding-right: 1.4rem; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="#" class="nav-logo">História · Prog</a>
+  <ul class="nav-links">
+    <li><a href="#timeline">Linha do Tempo</a></li>
+    <li><a href="#pioneiros">Pioneiros</a></li>
+    <li><a href="#ia">Assistente IA</a></li>
+    <li><a href="#quiz">Quiz</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <p class="hero-eyebrow">// trabalho escolar · história da computação</p>
+  <h1>A História da<br><span>Programação</span></h1>
+  <p class="hero-sub">De Ada Lovelace em 1843 ao código gerado por inteligência artificial — uma jornada pela evolução da linguagem que ensina as máquinas a pensar.</p>
+  <div class="hero-tags">
+    <span class="hero-tag">Linha do tempo</span>
+    <span class="hero-tag">Pioneiros</span>
+    <span class="hero-tag">Linguagens</span>
+    <span class="hero-tag">Fontes verificadas</span>
+    <span class="hero-tag">Quiz IA</span>
+  </div>
+  <div class="scroll-hint">role para explorar</div>
+</section>
+
+<!-- TIMELINE -->
+<section class="section" id="timeline">
+  <p class="section-label">// cronologia</p>
+  <h2 class="section-title">Linha do Tempo Detalhada</h2>
+  <div class="stats">
+    <div><div class="stat-num">1815</div><div class="stat-label">Nasce Ada Lovelace</div></div>
+    <div><div class="stat-num">700+</div><div class="stat-label">Linguagens criadas</div></div>
+    <div><div class="stat-num">1952</div><div class="stat-label">Primeiro compilador</div></div>
+    <div><div class="stat-num">2024</div><div class="stat-label">IA gera código</div></div>
+  </div>
+  <div class="timeline">
+
+    <div class="era">
+      <p class="era-year">// 1804</p>
+      <h3>O Tear de Jacquard — a pré-história da programação</h3>
+      <p>Antes de qualquer computador, o tecelão francês Joseph Marie Jacquard criou um tear completamente programável por cartões perfurados de papel. Cada cartão representava uma linha do padrão a ser tecido — uma lógica que inspiraria os pioneiros da computação décadas depois.</p>
+      <div class="era-tags"><span class="era-tag-pill">Precursor</span><span class="era-tag-pill">Cartões perfurados</span></div>
+      <a class="era-source" href="https://blog.lsantos.dev/backlog-primeira-linguagem/" target="_blank">Fonte: blog.lsantos.dev — A primeira linguagem de programação</a>
+    </div>
+
+    <div class="era">
+      <p class="era-year">// 1842–1843</p>
+      <h3>Ada Lovelace e o primeiro algoritmo da história</h3>
+      <p>Augusta Ada Byron King traduziu um artigo do engenheiro italiano Luigi Menabrea sobre a Máquina Analítica de Charles Babbage e acrescentou sete extensas notas de sua autoria. A Nota G descrevia um algoritmo para calcular os números de Bernoulli — o primeiro programa de computador já escrito. Ada também previu que computadores poderiam ir além de cálculos numéricos, antecipando conceitos que hoje reconhecemos na inteligência artificial.</p>
+      <div class="era-tags"><span class="era-tag-pill">Primeiro algoritmo</span><span class="era-tag-pill">Mulheres na ciência</span></div>
+      <a class="era-source" href="https://www.nationalgeographicbrasil.com/ciencia/2023/10/a-primeira-mulher-programadora-da-historia-previu-a-existencia-da-inteligencia-artificial" target="_blank">Fonte: National Geographic Brasil — Ada Lovelace</a>
+    </div>
+
+    <div class="era">
+      <p class="era-year">// 1936</p>
+      <h3>Alan Turing e a Máquina Universal</h3>
+      <p>Aos 24 anos, Alan Turing publicou "On Computable Numbers", propondo o conceito de uma máquina capaz de simular qualquer cálculo matemático. Esse modelo teórico tornou-se a base de toda a computação moderna. Na 2ª Guerra Mundial, Turing liderou a equipe que decifrou o código Enigma dos nazistas em Bletchley Park — uma contribuição que alterou o curso da guerra.</p>
+      <div class="era-tags"><span class="era-tag-pill">Teoria da computação</span><span class="era-tag-pill">2ª Guerra</span><span class="era-tag-pill">Enigma</span></div>
+      <a class="era-source" href="https://www.techtudo.com.br/guia/2023/04/quem-foi-alan-turing-saiba-a-historia-do-pai-da-ciencia-da-computacao-edinfoeletro.ghtml" target="_blank">Fonte: TechTudo — Alan Turing</a>
+    </div>
+
+    <div class="era">
+      <p class="era-year">// 1944–1952</p>
+      <h3>Grace Hopper, o compilador e o COBOL</h3>
+      <p>Em 1944, Grace Hopper integrou a equipe do Harvard Mark I. Em 1952, criou o compilador A-0, que traduzia notação matemática em código de máquina — uma ideia que seus colegas achavam impossível. Ela acreditava que programadores deveriam escrever em inglês, não em símbolos. Em 1945, encontrou uma mariposa presa num relé do Mark II, popularizando o termo "bug". Sua visão resultou no COBOL (1959), linguagem ainda usada em bancos e governos ao redor do mundo.</p>
+      <div class="era-tags"><span class="era-tag-pill">Compilador</span><span class="era-tag-pill">COBOL</span><span class="era-tag-pill">Bug</span></div>
+      <a class="era-source" href="https://www.ufrgs.br/enigma/grace-hopper/" target="_blank">Fonte: Projeto ENIGMA — UFRGS</a>
+    </div>
+
+    <div class="era">
+      <p class="era-year">// 1954–1957</p>
+      <h3>FORTRAN — a primeira linguagem de alto nível</h3>
+      <p>A equipe da IBM liderada por John Backus criou o FORTRAN (FORmula TRANslation). Antes dela, programadores produziam cerca de 100 linhas de código por semana em linguagem de máquina. Com o FORTRAN, esse número saltou para 5.000 linhas semanais. A linguagem ainda é usada em supercomputadores para simulações científicas.</p>
+      <div class="era-tags"><span class="era-tag-pill">Alto nível</span><span class="era-tag-pill">IBM</span><span class="era-tag-pill">Ciência</span></div>
+      <a class="era-source" href="https://www.robertodiasduarte.com.br/historia-das-linguagens-de-programacao-evolucao-e-impactos/" target="_blank">Fonte: robertodiasduarte.com.br — História das linguagens</a>
+    </div>
+
+    <div class="era">
+      <p class="era-year">// 1958–1972</p>
+      <h3>LISP, ALGOL e a linguagem C</h3>
+      <p>John McCarthy criou o LISP no MIT em 1958, projetado para inteligência artificial. O ALGOL serviu de base para Pascal, C, C++ e Java. Em 1972, Dennis Ritchie criou a linguagem C nos laboratórios Bell junto ao Unix. C tornou-se a linguagem mais influente da história — C#, Java, JavaScript, PHP e Python são todos seus descendentes.</p>
+      <div class="era-tags"><span class="era-tag-pill">Linguagem C</span><span class="era-tag-pill">Unix</span><span class="era-tag-pill">LISP/IA</span></div>
+      <a class="era-source" href="https://www.atra.com.br/2023/04/05/historia-das-linguagens-de-programacao/" target="_blank">Fonte: atra.com.br — História das linguagens</a>
+    </div>
+
+    <div class="era">
+      <p class="era-year">// 1991</p>
+      <h3>Python — legibilidade como filosofia</h3>
+      <p>Guido van Rossum lançou Python com a filosofia de que código é lido muito mais do que escrito. A linguagem cresceu para se tornar o principal veículo da revolução de IA e ciência de dados nas décadas seguintes.</p>
+      <div class="era-tags"><span class="era-tag-pill">Python</span><span class="era-tag-pill">Open source</span><span class="era-tag-pill">IA</span></div>
+      <a class="era-source" href="https://imasters.com.br/tecnologia/a-evolucao-das-linguagens-de-programacao-de-cobol-a-python" target="_blank">Fonte: iMasters — Evolução das linguagens</a>
+    </div>
+
+    <div class="era">
+      <p class="era-year">// 1995</p>
+      <h3>JavaScript e a web interativa</h3>
+      <p>Brendan Eich criou o JavaScript em apenas 10 dias para a Netscape. Hoje é a linguagem mais usada no planeta, presente em navegadores, servidores (Node.js), aplicativos mobile e dispositivos embarcados.</p>
+      <div class="era-tags"><span class="era-tag-pill">Web</span><span class="era-tag-pill">Netscape</span><span class="era-tag-pill">Ubíquo</span></div>
+      <a class="era-source" href="https://pt.wikipedia.org/wiki/Hist%C3%B3ria_das_linguagens_de_programa%C3%A7%C3%A3o" target="_blank">Fonte: Wikipedia PT — História das linguagens</a>
+    </div>
+
+    <div class="era">
+      <p class="era-year">// 2017 — presente</p>
+      <h3>IA generativa transforma o desenvolvimento</h3>
+      <p>Com modelos de linguagem como GPT, Codex e Claude, a IA passou a gerar, sugerir e completar código funcional. A fronteira entre "aprender a programar" e "colaborar com IA" tornou-se cada vez mais fluida — um ciclo que começou com Ada Lovelace prevendo que máquinas poderiam fazer muito mais do que calcular.</p>
+      <div class="era-tags"><span class="era-tag-pill">IA generativa</span><span class="era-tag-pill">LLMs</span><span class="era-tag-pill">Presente</span></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- PIONEIROS -->
+<section class="section" id="pioneiros" style="background: var(--bg2); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);">
+  <p class="section-label">// perfis biográficos</p>
+  <h2 class="section-title">Pioneiros que Mudaram Tudo</h2>
+  <div class="pioneers-grid">
+
+    <div class="pioneer-card">
+      <div class="pioneer-emoji">👩‍💻</div>
+      <div class="pioneer-name">Ada Lovelace</div>
+      <div class="pioneer-years">1815 — 1852</div>
+      <p class="pioneer-desc">Matemática inglesa e filha do poeta Lord Byron. Colaborou com Charles Babbage e produziu as notas que descrevem o primeiro algoritmo da história. Morreu aos 36 anos de câncer sem ver seu legado reconhecido — suas notas só foram republicadas mais de cem anos depois.</p>
+      <div class="pioneer-fact">"Ada previu que computadores poderiam ir além dos números — chegando à composição musical." — National Geographic Brasil</div>
+      <a class="pioneer-source" href="https://www.ufmg.br/espacodoconhecimento/ada-lovelace-a-primeira-programadora-da-historia/" target="_blank">Espaço do Conhecimento UFMG</a>
+    </div>
+
+    <div class="pioneer-card">
+      <div class="pioneer-emoji">🧮</div>
+      <div class="pioneer-name">Alan Turing</div>
+      <div class="pioneer-years">1912 — 1954</div>
+      <p class="pioneer-desc">Matemático britânico e "pai da computação moderna". Criou a Máquina de Turing em 1936, liderou a quebra do Enigma e propôs o Teste de Turing para avaliar inteligência artificial. Perseguido pelo governo britânico por ser gay, recebeu perdão real póstumo em 2013. Em 2021 passou a estampar a nota de £50.</p>
+      <div class="pioneer-fact">"A brincadeira de imitação de Turing é a base filosófica do debate sobre IA até hoje." — National Geographic Brasil</div>
+      <a class="pioneer-source" href="https://www.alura.com.br/artigos/decifrando-alan-turing-vida-trajetoria-tecnologia" target="_blank">Alura — Alan Turing</a>
+    </div>
+
+    <div class="pioneer-card">
+      <div class="pioneer-emoji">⚓</div>
+      <div class="pioneer-name">Grace Hopper</div>
+      <div class="pioneer-years">1906 — 1992</div>
+      <p class="pioneer-desc">Almirante da Marinha dos EUA e cientista da computação. Criou o primeiro compilador (A-0, 1952) e foi força motriz por trás do COBOL. Recebeu a Medalha Nacional de Tecnologia em 1991 e a Medalha Presidencial de Liberdade postumamente em 2016 — a maior honra civil dos EUA.</p>
+      <div class="pioneer-fact">"Ela foi a primeira a mostrar que um programa poderia ser compilado — algo que seus colegas achavam impossível." — UFRGS</div>
+      <a class="pioneer-source" href="https://www.ufrgs.br/enigma/grace-hopper/" target="_blank">Projeto ENIGMA — UFRGS</a>
+    </div>
+
+    <div class="pioneer-card">
+      <div class="pioneer-emoji">🔬</div>
+      <div class="pioneer-name">Dennis Ritchie</div>
+      <div class="pioneer-years">1941 — 2011</div>
+      <p class="pioneer-desc">Criou a linguagem C nos Bell Labs em 1972 e co-criou o Unix com Ken Thompson. C tornou-se a base de quase todas as linguagens modernas — Java, Python, PHP, JavaScript e C# são todos descendentes diretos ou indiretos.</p>
+      <div class="pioneer-fact">"Muitas das linguagens líderes atuais derivam de C, incluindo Java, JavaScript e Python." — atra.com.br</div>
+      <a class="pioneer-source" href="https://www.atra.com.br/2023/04/05/historia-das-linguagens-de-programacao/" target="_blank">atra.com.br — História das linguagens</a>
+    </div>
+
+    <div class="pioneer-card">
+      <div class="pioneer-emoji">🐍</div>
+      <div class="pioneer-name">Guido van Rossum</div>
+      <div class="pioneer-years">1956 — presente</div>
+      <p class="pioneer-desc">Programador holandês que criou Python em 1991 com a filosofia de que código é lido muito mais do que escrito. Python tornou-se a principal linguagem da revolução de dados e IA, usada por pesquisadores e desenvolvedores em todo o mundo.</p>
+      <div class="pioneer-fact">"Python foi projetado para que mesmo iniciantes conseguissem programar com clareza e elegância." — iMasters</div>
+      <a class="pioneer-source" href="https://imasters.com.br/tecnologia/a-evolucao-das-linguagens-de-programacao-de-cobol-a-python" target="_blank">iMasters — Evolução das linguagens</a>
+    </div>
+
+    <div class="pioneer-card">
+      <div class="pioneer-emoji">🌐</div>
+      <div class="pioneer-name">Brendan Eich</div>
+      <div class="pioneer-years">1961 — presente</div>
+      <p class="pioneer-desc">Criou o JavaScript em apenas 10 dias em 1995 para a Netscape. O que era uma linguagem de scripting básica tornou-se o ecossistema mais amplo do planeta, presente em praticamente todos os dispositivos conectados.</p>
+      <div class="pioneer-fact">"JavaScript foi criado em 10 dias — e tornou-se a linguagem mais usada do mundo." — Wikipedia PT</div>
+      <a class="pioneer-source" href="https://pt.wikipedia.org/wiki/Hist%C3%B3ria_das_linguagens_de_programa%C3%A7%C3%A3o" target="_blank">Wikipedia PT — História das linguagens</a>
+    </div>
+
+  </div>
+</section>
+
+<!-- IA CHAT -->
+<section class="section" id="ia">
+  <div class="chat-wrapper">
+    <p class="section-label">// assistente especializado</p>
+    <h2 class="section-title">Pergunte à IA com Fontes</h2>
+    <p style="color: var(--muted); font-size: 0.88rem; margin-bottom: 2rem;">O assistente responde com base em informações verificadas e cita fontes reais ao final de cada resposta.</p>
+    <div class="chat-box">
+      <div class="chat-messages" id="chatMessages">
+        <div class="msg ai">
+          <div class="msg-avatar">IA</div>
+          <div class="msg-text">Olá! Sou seu assistente especializado em história da programação. Respondo com fontes verificadas e citações ao final. O que você quer explorar?</div>
+        </div>
+      </div>
+      <div class="chat-input-area">
+        <textarea class="chat-input" id="chatInput" placeholder="Ex: Qual foi o papel de Grace Hopper na programação?" rows="1"></textarea>
+        <button class="chat-btn" id="sendBtn" onclick="sendMessage()">Enviar</button>
+      </div>
+    </div>
+    <div class="quick-questions">
+      <button class="quick-btn" onclick="askQuick('Quem foi Ada Lovelace e qual foi sua contribuição?')">Ada Lovelace</button>
+      <button class="quick-btn" onclick="askQuick('Como Alan Turing influenciou a computação moderna?')">Alan Turing</button>
+      <button class="quick-btn" onclick="askQuick('O que Grace Hopper inventou e por que é importante?')">Grace Hopper</button>
+      <button class="quick-btn" onclick="askQuick('Como a linguagem C influenciou as linguagens modernas?')">Linguagem C</button>
+      <button class="quick-btn" onclick="askQuick('Como a IA generativa está mudando a programação?')">IA e código</button>
+      <button class="quick-btn" onclick="askQuick('Quais são os paradigmas de programação mais importantes?')">Paradigmas</button>
+    </div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section class="section" id="quiz" style="background: var(--bg2); border-top: 1px solid var(--line);">
+  <p class="section-label">// teste seus conhecimentos</p>
+  <h2 class="section-title">Quiz Infinito com IA</h2>
+  <p style="color: var(--muted); font-size: 0.88rem; margin-bottom: 2rem;">Perguntas geradas por IA a cada rodada — nunca se repetem!</p>
+  <div class="quiz-wrapper">
+    <div class="quiz-box" id="quizBox">
+      <div id="quizContent" style="text-align:center; padding: 2rem 0;">
+        <p style="color:var(--muted); font-size:0.9rem; margin-bottom:1.5rem;">Pronto para testar seus conhecimentos sobre história da programação?</p>
+        <button class="quiz-start-btn" onclick="startQuiz()">Iniciar Quiz</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FONTES -->
+<div class="sources-footer">
+  <h4>// fontes utilizadas neste site</h4>
+  <div class="source-list-footer">
+    <a href="https://www.nationalgeographicbrasil.com/ciencia/2023/10/a-primeira-mulher-programadora-da-historia-previu-a-existencia-da-inteligencia-artificial" target="_blank">National Geographic Brasil — Ada Lovelace e a Inteligência Artificial (2023)</a>
+    <a href="https://www.ufmg.br/espacodoconhecimento/ada-lovelace-a-primeira-programadora-da-historia/" target="_blank">Espaço do Conhecimento UFMG — Ada Lovelace, a primeira programadora</a>
+    <a href="https://www.techtudo.com.br/guia/2023/04/quem-foi-alan-turing-saiba-a-historia-do-pai-da-ciencia-da-computacao-edinfoeletro.ghtml" target="_blank">TechTudo — Alan Turing, pai da ciência da computação (2023)</a>
+    <a href="https://www.alura.com.br/artigos/decifrando-alan-turing-vida-trajetoria-tecnologia" target="_blank">Alura — Decifrando Alan Turing: vida e trajetória na tecnologia</a>
+    <a href="https://warren.com.br/magazine/alan-turing/" target="_blank">Warren — Alan Turing: um gênio injustiçado da matemática</a>
+    <a href="https://www.techtudo.com.br/guia/2023/09/grace-hopper-veja-quem-foi-e-qual-o-legado-da-cientista-da-computacao-edinfoeletro.ghtml" target="_blank">TechTudo — Grace Hopper e o primeiro compilador (2023)</a>
+    <a href="https://www.ufrgs.br/enigma/grace-hopper/" target="_blank">Projeto ENIGMA (UFRGS) — Grace Hopper e o COBOL</a>
+    <a href="https://www.atra.com.br/2023/04/05/historia-das-linguagens-de-programacao/" target="_blank">ATRA — História das linguagens de programação (2023)</a>
+    <a href="https://imasters.com.br/tecnologia/a-evolucao-das-linguagens-de-programacao-de-cobol-a-python" target="_blank">iMasters — Evolução das linguagens: de COBOL a Python (2024)</a>
+    <a href="https://www.robertodiasduarte.com.br/historia-das-linguagens-de-programacao-evolucao-e-impactos/" target="_blank">Roberto Dias Duarte — História e impactos das linguagens (2025)</a>
+    <a href="https://blog.lsantos.dev/backlog-primeira-linguagem/" target="_blank">blog.lsantos.dev — A primeira linguagem de programação (2024)</a>
+    <a href="https://pt.wikipedia.org/wiki/Hist%C3%B3ria_das_linguagens_de_programa%C3%A7%C3%A3o" target="_blank">Wikipedia PT — História das linguagens de programação</a>
+  </div>
+</div>
+
+<footer>
+  <p>// história da programação — pesquisado e produzido com Claude</p>
+  <p>trabalho escolar · todas as fontes verificadas</p>
+</footer>
+
+<script>
+// ANIMATIONS
+const eras = document.querySelectorAll('.era');
+const obs = new IntersectionObserver(entries => {
+  entries.forEach((e, i) => { if (e.isIntersecting) setTimeout(() => e.target.classList.add('visible'), i * 70); });
+}, { threshold: 0.1 });
+eras.forEach(el => obs.observe(el));
+
+// TEXTAREA
+const input = document.getElementById('chatInput');
+input.addEventListener('input', function() { this.style.height = 'auto'; this.style.height = Math.min(this.scrollHeight, 120) + 'px'; });
+input.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } });
+
+// CHAT
+const SYSTEM_PROMPT = `Você é um especialista em história da programação para um trabalho escolar de nível médio/superior.
+Responda de forma educativa, precisa e com fatos verificados (datas, nomes, contexto histórico).
+Ao final de CADA resposta, inclua uma seção chamada FONTES com 2-3 fontes reais em português.
+Formato das fontes:
+FONTES:
+[Nome do site — Título do artigo] | https://url-real.com
+
+Use fontes como: TechTudo, Alura, UFMG, National Geographic Brasil, Wikipedia PT, iMasters, DIO, Locaweb.
+Destaque termos importantes com **negrito**.
+Responda em português do Brasil. Seja completo mas objetivo (3-6 parágrafos).`;
+
+let conversationHistory = [];
+
+async function sendMessage() {
+  const text = input.value.trim();
+  if (!text) return;
+  addMsg(text, 'user');
+  input.value = ''; input.style.height = 'auto';
+  const btn = document.getElementById('sendBtn');
+  btn.disabled = true;
+  const typing = addTyping();
+  conversationHistory.push({ role: 'user', content: text });
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 1000, system: SYSTEM_PROMPT, messages: conversationHistory })
+    });
+    const data = await res.json();
+    const reply = data.content?.map(c => c.text || '').join('') || 'Erro ao gerar resposta.';
+    conversationHistory.push({ role: 'assistant', content: reply });
+    typing.remove();
+    renderAIMsg(reply);
+  } catch(e) {
+    typing.remove();
+    addMsg('Erro de conexão. Tente novamente.', 'ai');
+  }
+  btn.disabled = false;
+  input.focus();
+}
+
+function askQuick(q) { input.value = q; sendMessage(); }
+
+function renderAIMsg(text) {
+  const msgs = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = 'msg ai';
+  const av = document.createElement('div');
+  av.className = 'msg-avatar'; av.textContent = 'IA';
+  const parts = text.split(/FONTES:/i);
+  const mainText = parts[0];
+  const sourcesRaw = parts[1] || '';
+  const ct = document.createElement('div');
+  ct.className = 'msg-text';
+  ct.innerHTML = '<p>' + mainText.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n\n/g,'</p><p style="margin-top:.6rem">').replace(/\n/g,'<br>') + '</p>';
+  if (sourcesRaw.trim()) {
+    const sd = document.createElement('div');
+    sd.className = 'msg-sources';
+    sourcesRaw.split('\n').filter(l => l.includes('http')).forEach(line => {
+      const url = line.match(/https?:\/\/[^\s|]+/);
+      const title = line.match(/\[([^\]]+)\]/);
+      if (url) {
+        const a = document.createElement('a');
+        a.href = url[0]; a.target = '_blank'; a.className = 'msg-src-link';
+        a.textContent = title ? title[1].substring(0,40) + (title[1].length > 40 ? '…' : '') : 'Fonte';
+        sd.appendChild(a);
+      }
+    });
+    if (sd.children.length) ct.appendChild(sd);
+  }
+  div.appendChild(av); div.appendChild(ct);
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function addMsg(text, role) {
+  const msgs = document.getElementById('chatMessages');
+  const div = document.createElement('div'); div.className = `msg ${role}`;
+  const av = document.createElement('div'); av.className = 'msg-avatar'; av.textContent = role === 'user' ? 'Eu' : 'IA';
+  const ct = document.createElement('div'); ct.className = 'msg-text'; ct.textContent = text;
+  div.appendChild(av); div.appendChild(ct); msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight; return div;
+}
+
+function addTyping() {
+  const msgs = document.getElementById('chatMessages');
+  const div = document.createElement('div'); div.className = 'msg ai';
+  const av = document.createElement('div'); av.className = 'msg-avatar'; av.textContent = 'IA';
+  const ct = document.createElement('div'); ct.className = 'msg-text';
+  ct.innerHTML = '<div class="typing"><span></span><span></span><span></span></div>';
+  div.appendChild(av); div.appendChild(ct); msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight; return div;
+}
+
+// QUIZ
+const QUIZ_SYS = `Você é um gerador de perguntas de quiz sobre história da programação para trabalho escolar.
+Gere 1 pergunta de múltipla escolha com 4 opções (A, B, C, D).
+Retorne APENAS JSON válido, sem markdown, sem texto extra, sem crases:
+{"question":"...","options":["A) ...","B) ...","C) ...","D) ..."],"correct":0,"explanation":"..."}
+- correct é o índice (0=A, 1=B, 2=C, 3=D)
+- explanation é uma explicação curta e educativa (1-2 frases)
+- Varie: pioneiros, datas, linguagens, conceitos, curiosidades históricas
+- Dificuldade variada entre fácil e difícil`;
+
+let quizQ = null, quizScore = 0, quizTotal = 0, quizAnswered = false;
+
+async function startQuiz() { quizScore = 0; quizTotal = 0; await loadQ(); }
+
+async function loadQ() {
+  quizAnswered = false;
+  document.getElementById('quizContent').innerHTML = `<div style="text-align:center;padding:2rem 0;"><div class="typing" style="justify-content:center"><span></span><span></span><span></span></div><p style="color:var(--muted);font-size:0.8rem;margin-top:.75rem;font-family:'IBM Plex Mono',monospace;">Gerando pergunta com IA…</p></div>`;
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514', max_tokens: 500,
+        system: QUIZ_SYS,
+        messages: [{ role: 'user', content: 'Gere uma pergunta de quiz sobre história da programação. Pergunta número ' + (quizTotal + 1) + '. Varie o tema e dificuldade.' }]
+      })
+    });
+    const data = await res.json();
+    const raw = data.content?.map(c => c.text||'').join('').replace(/```json|```/g,'').trim();
+    quizQ = JSON.parse(raw);
+    renderQ();
+  } catch(e) {
+    document.getElementById('quizContent').innerHTML = '<p style="color:var(--muted);text-align:center;padding:2rem">Erro ao gerar pergunta. <button class="quiz-start-btn" onclick="loadQ()" style="margin-left:1rem;font-size:0.65rem;padding:.4rem 1rem">Tentar de novo</button></p>';
+  }
+}
+
+function renderQ() {
+  quizTotal++;
+  const pct = quizTotal > 1 ? Math.round((quizScore / (quizTotal - 1)) * 100) : 0;
+  document.getElementById('quizContent').innerHTML = `
+    <div class="quiz-progress">
+      <span>Pergunta ${quizTotal} &nbsp;·&nbsp; Acertos: ${quizScore}${quizTotal > 1 ? ' (' + pct + '%)' : ''}</span>
+      <div class="quiz-bar"><div class="quiz-bar-fill" style="width:${pct}%"></div></div>
+    </div>
+    <div class="quiz-question">${quizQ.question}</div>
+    <div class="quiz-options" id="quizOpts">
+      ${quizQ.options.map((opt, i) => `<button class="quiz-opt" onclick="answer(${i})" id="qo${i}"><span class="opt-letter">${String.fromCharCode(65+i)}</span><span>${opt.substring(3)}</span></button>`).join('')}
+    </div>
+    <div id="quizFB"></div>`;
+}
+
+function answer(idx) {
+  if (quizAnswered) return;
+  quizAnswered = true;
+  document.querySelectorAll('.quiz-opt').forEach(o => o.disabled = true);
+  const c = quizQ.correct;
+  if (idx === c) quizScore++;
+  document.getElementById('qo' + idx).classList.add(idx === c ? 'correct' : 'wrong');
+  if (idx !== c) document.getElementById('qo' + c).classList.add('correct');
+  document.getElementById('quizFB').innerHTML = `
+    <div class="quiz-feedback ${idx===c?'ok':'ko'}">${idx===c ? '✓ Correto!' : '✗ Incorreto.'} ${quizQ.explanation}</div>
+    <button class="quiz-next-btn" onclick="loadQ()">Próxima pergunta →</button>`;
+}
+</script>
+</body>
+</html>
